@@ -5,6 +5,7 @@ import json
 
 app = flask.Flask(__name__)
 
+
 def _connect_db(remote=False):
     """
     Connects to learnbet database and returns the database object.
@@ -55,8 +56,7 @@ def _get_match(team_home, team_away, match_datetime=None):
 
 @app.route("/get_match", methods=["GET", "POST"])
 def get_match():
-    print("Inside match method!")
-    data = {"success": False}
+    match = {"success": False}
 
     # Check both request.json and request.args
     # Depending on how the function is called (eg. browser get vs curl post)
@@ -64,14 +64,35 @@ def get_match():
     if params == None:
         params = flask.request.args
 
-    # If parameters are found, echo the msg back
     if params:
-        data["response"] = params.get("msg")
-        data["success"] = True
-        data['match'] = _get_match("Atalanta", "Inter Milan")
+        team_home = params.get("team_home")
+        team_away = params.get("team_away")
+        match = _get_match(team_home, team_away)
+
+    if not match:
+        return "Match not found"
 
     # Return a response in json format
-    # return flask.jsonify(data)
-    return str(data)
+
+    match['len_total_goals'] = len(match['all_odds']['total_goals'])
+    match['len_winner'] = len(match['all_odds']['winner'])
+    del match['all_odds']
+    del match['_id']
+    match['match_datetime'] = str(match['match_datetime'])
+    # del data['match']['od']
+    # return str(data['match'].keys())
+    # return json.dumps(data, indent=4)
+    return flask.jsonify(match)
+
+
+@app.route('/teams/<team>')
+def show_team_matches(team):
+    # todo: retrieve all matches for <team>
+    return "Team %s" % team
+
+
+@app.route('/')
+def index():
+    return flask.render_template('webpage1.html')
 
 app.run(host='0.0.0.0')
