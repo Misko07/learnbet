@@ -15,8 +15,6 @@ def plot_odds_winner(db_, team_home, team_away):
     todo: creating the dataframe should be done in a different function
     """
 
-    import matplotlib.pyplot as plt
-
     # Retrieve match from database
     m = db_.matches.find_one({'team_home': team_home, 'team_away': team_away})
     if m is None:

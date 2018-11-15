@@ -114,8 +114,27 @@ def create_odds_df(m_dict):
     return df
 
 
-if __name__ == "__main__":
+def get_scheduled_matches():
     db = connect_db(remote=True)
-    m = db.matches.find_one({'team_home': "Atalanta", 'team_away': "Inter Milan"})
-    res = create_odds_df(m)
-    print(res.head(5))
+    ms = db.matches.find({ "$query": {'status': 'scheduled'}, "$orderby": {"match_datetime": 1}})
+    match_list = []
+    for m in ms:
+        del m['odds_link']
+        del m['all_odds']
+        del m['result']
+        del m['team_home_last6']
+        del m['team_away_last6']
+        del m['_id']
+        match_list.append(m)
+    return match_list
+
+
+if __name__ == "__main__":
+    ms = get_scheduled_matches()
+    print(len(ms))
+    print(ms[:2])
+
+    # db = connect_db(remote=True)
+    # m = db.matches.find_one({'team_home': "Atalanta", 'team_away': "Inter Milan"})
+    # res = create_odds_df(m)
+    # print(res.head(5))

@@ -55,6 +55,19 @@ def get_goals_odds():
     return "Match %s - %s not found!" % (team_home, team_away)
 
 
+@app.route("/next_matches", methods=["GET", "POST"])
+def get_next_matches():
+
+    results = {}
+    results['success'] = False
+    ms = utils.get_scheduled_matches()
+    if len(ms) > 0:
+        results['success'] = True
+        results['matches'] = ms
+        return flask.jsonify(results)
+    return "No scheduled matches."
+
+
 @app.route('/teams/<team>')
 def show_team_matches(team):
     # todo: retrieve all matches for <team>
@@ -65,4 +78,7 @@ def show_team_matches(team):
 def index():
     return flask.render_template('webpage1.html')
 
-app.run(host='0.0.0.0')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
+    # get_goals_odds("Croatia", "Spain")
