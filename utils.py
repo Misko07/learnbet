@@ -77,9 +77,10 @@ def create_odds_df(m_dict):
 
         # Create a list of unique bookies on that datetime
         bookies_unique = [item['bookie'] for item in winner_odds_list]
-        for goals_odd in goals_odds_list:
-            if goals_odd['bookie'] not in bookies_unique:
-                bookies_unique.append(goals_odd['bookie'])
+        if goals_odds_list is not None:
+            for goals_odd in goals_odds_list:
+                if goals_odd['bookie'] not in bookies_unique:
+                    bookies_unique.append(goals_odd['bookie'])
 
         # Go through bookies in the unuque list
         for bookie in bookies_unique:
@@ -87,19 +88,21 @@ def create_odds_df(m_dict):
                    'bookie': bookie}
 
             # If bookie found in goals_odds_list add some data to row
-            for goals_odd in goals_odds_list:
-                if bookie == goals_odd['bookie']:
-                    row['over2_5'] = goals_odd['over2_5']
-                    row['under2_5'] = goals_odd['under2_5']
-                    break
+            if goals_odds_list is not None:
+                for goals_odd in goals_odds_list:
+                    if bookie == goals_odd['bookie']:
+                        row['over2_5'] = goals_odd['over2_5']
+                        row['under2_5'] = goals_odd['under2_5']
+                        break
 
             # If bookie found in winner_odds_list add some data to row
-            for winner_odd in winner_odds_list:
-                if bookie == winner_odd['bookie']:
-                    row['1'] = winner_odd['1']
-                    row['2'] = winner_odd['2']
-                    row['0'] = winner_odd['0']
-                    break
+            if winner_odds_list is not None:
+                for winner_odd in winner_odds_list:
+                    if bookie == winner_odd['bookie']:
+                        row['1'] = winner_odd['1']
+                        row['2'] = winner_odd['2']
+                        row['0'] = winner_odd['0']
+                        break
 
             # Append line to the list of lines
             rows.append(row)
