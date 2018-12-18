@@ -13,7 +13,7 @@ def connect_db(remote=False):
     """
 
     if remote:
-        print("Connecting to remote db..")
+        print("Connecting to remote db..", end=" ")
         with open("db_credentials_remote.json", "r") as file:
             db_config = json.load(file)
     else:
@@ -28,6 +28,9 @@ def connect_db(remote=False):
 
     client = pymongo.MongoClient(uri)
     db = client.get_database()
+
+    if remote:
+        print("done.")
 
     return db
 
@@ -119,9 +122,9 @@ def create_odds_df(m_dict):
 
 def get_scheduled_matches():
     db = connect_db(remote=True)
-    ms = db.matches.find({ "$query": {'status': 'scheduled'}, "$orderby": {"match_datetime": 1}})
+    ms_ = db.matches.find({"$query": {'status': 'scheduled'}})
     match_list = []
-    for m in ms:
+    for m in ms_:
         del m['odds_link']
         del m['all_odds']
         del m['result']
@@ -129,7 +132,11 @@ def get_scheduled_matches():
         del m['team_away_last6']
         del m['_id']
         match_list.append(m)
-    return match_list
+
+    # Sort match_list by `match_datetime` key
+    ml = sorted(match_list, key=lambda k: k['match_datetime'])
+
+    return ml
 
 
 if __name__ == "__main__":
